@@ -1,8 +1,11 @@
 name: Hub - Kronos forecast
 
 # Kronos (github.com/shiyu-coder/Kronos) daily-bar forecast for the watchlist.
-# No API key needed; runs on CPU. Manual trigger only.
+# No API key needed; runs on CPU. Weekdays at 22:45 UTC (02:45 Dubai), after
+# the US close, plus manual runs.
 on:
+  schedule:
+    - cron: '45 22 * * 1-5'
   workflow_dispatch:
     inputs:
       tickers:

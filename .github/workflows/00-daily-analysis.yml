@@ -1,9 +1,11 @@
 name: 每日股票分析
 
 on:
-  # 定时触发 - 每天北京时间 18:00 (UTC 10:00)
+  # Daily at 22:30 UTC = 02:30 Dubai: after the US close, so every market's
+  # same-day close is in. Days when every market is shut are skipped by the
+  # tool's own trading-day check.
   schedule:
-    - cron: '0 10 * * 1-5'     # 周一到周五，UTC 10:00 = 北京时间 18:00
+    - cron: '30 22 * * *'
   
   # 手动触发
   workflow_dispatch:
