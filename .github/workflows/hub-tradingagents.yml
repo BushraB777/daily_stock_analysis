@@ -1,0 +1,59 @@
+name: Hub - TradingAgents
+
+# TradingAgents (github.com/TauricResearch/TradingAgents) multi-agent debate on
+# a few tickers, using the GEMINI_API_KEY secret. Dozens of Gemini calls per
+# ticker: keep it to 1-3 tickers on the free tier. Manual trigger only.
+on:
+  workflow_dispatch:
+    inputs:
+      tickers:
+        description: 'Tickers, 1-3 recommended (STOCK_LIST format)'
+        required: true
+        default: 'NVDA'
+      trade_date:
+        description: 'Analysis date YYYY-MM-DD (empty = today)'
+        required: false
+        default: ''
+
+permissions:
+  contents: read
+
+concurrency:
+  group: hub-tradingagents
+  cancel-in-progress: false
+
+jobs:
+  agents:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.13'
+
+      - name: Install TradingAgents (pinned)
+        run: |
+          pip install --upgrade pip
+          pip install "tradingagents @ git+https://github.com/TauricResearch/TradingAgents@9fa1196fffbcfd9de5146d2dd2869df84ab99838"
+
+      - name: Run agents
+        env:
+          TICKERS: ${{ github.event.inputs.tickers }}
+          TRADE_DATE: ${{ github.event.inputs.trade_date }}
+          GOOGLE_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          SEC_EDGAR_USER_AGENT: ${{ secrets.SEC_EDGAR_USER_AGENT }}
+          FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
+          DEEP_MODEL: ${{ vars.TA_DEEP_MODEL }}
+          QUICK_MODEL: ${{ vars.TA_QUICK_MODEL }}
+          TRADINGAGENTS_NO_UPDATE_CHECK: '1'
+          OUT_DIR: ta_out
+        run: python hub/tradingagents_run.py
+
+      - uses: actions/upload-artifact@v6
+        if: always()
+        with:
+          name: tradingagents-${{ github.run_number }}
+          path: ta_out/
+          retention-days: 30
