@@ -50,7 +50,8 @@ def main():
     summary = []
     for sym in tickers:
         try:
-            state, signal = ta.propagate(sym, date)
+            asset = "crypto" if sym.endswith(("-USD", "-USDT")) else "stock"
+            state, signal = ta.propagate(sym, date, asset_type=asset)
             path = ta.save_reports(state, sym, save_path=OUT / sym)
             summary.append({"symbol": sym, "date": date, "rating": str(signal), "report_dir": str(path)})
             print("%-10s %s" % (sym, signal))

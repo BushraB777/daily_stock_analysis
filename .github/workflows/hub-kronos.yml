@@ -50,7 +50,8 @@ jobs:
 
       - name: Forecast
         env:
-          TICKERS: ${{ github.event.inputs.tickers || vars.STOCK_LIST }}
+          # STOCK_LIST plus KRONOS_EXTRA (crypto coins the dashboard tool can't analyze)
+          TICKERS: ${{ github.event.inputs.tickers || format('{0},{1}', vars.STOCK_LIST, vars.KRONOS_EXTRA) }}
           PRED_DAYS: ${{ github.event.inputs.pred_days || '5' }}
           KRONOS_DIR: kronos_src
           OUT_DIR: kronos_out
