@@ -1,11 +1,12 @@
 name: 每日股票分析
 
 on:
-  # Daily at 22:30 UTC = 02:30 Dubai: after the US close, so every market's
-  # same-day close is in. Days when every market is shut are skipped by the
-  # tool's own trading-day check.
+  # Weekdays at 21:15 UTC = 01:15 Dubai, after the US close, so each market's
+  # same-day close is in. GitHub often starts scheduled runs hours late, so the
+  # TRADING_DAY_CHECK_ENABLED variable is set to false: a late start past
+  # midnight UTC must not drop the markets that are already "tomorrow".
   schedule:
-    - cron: '30 22 * * *'
+    - cron: '15 21 * * 1-5'
   
   # 手动触发
   workflow_dispatch:
