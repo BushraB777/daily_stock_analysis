@@ -56,7 +56,9 @@ def main():
         try:
             df = bars(sym)
             last = df.index[-1]
-            future = pd.bdate_range(last + pd.Timedelta(days=1), periods=PRED_DAYS)
+            # Crypto trades every day; stocks only on business days.
+            rng = pd.date_range if sym.endswith(("-USD", "-USDT")) else pd.bdate_range
+            future = rng(last + pd.Timedelta(days=1), periods=PRED_DAYS)
             p = pred.predict(
                 df=df[["open", "high", "low", "close", "volume", "amount"]].reset_index(drop=True),
                 x_timestamp=pd.Series(df.index),
